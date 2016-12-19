@@ -24,7 +24,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('uphta')->everyMinute()->sendOutputTo(storage_path('logs/htaccess'));
+        $schedule->command('uphta')->everyMinute();
     }
 
     /**

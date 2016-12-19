@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Entry;
 use App\Task;
+use File;
 
 class UpdateHtaccess extends Command
 {
@@ -21,6 +22,11 @@ class UpdateHtaccess extends Command
      * @var string
      */
     protected $description = 'update htaccess allow list from db entry';
+    
+    /**
+     * @var string updated htaccess
+     */
+    protected $outputFile = '';
 
     /**
      * Create a new command instance.
@@ -30,6 +36,8 @@ class UpdateHtaccess extends Command
     public function __construct()
     {
         parent::__construct();
+        
+        $this->outputFile = env('OUTPUT_HTACCESS', storage_path('logs/htaccess'));
     }
 
     /**
@@ -45,7 +53,7 @@ class UpdateHtaccess extends Command
             return;
         }
         
-        $this->line($this->makeEntry());
+        $this->writeToFile($this->makeEntry());
         
         $task->flg = 0;
         $task->save();
@@ -64,5 +72,15 @@ EOT;
         }
 
         return $htaccess;
+    }
+    
+    protected function writeToFile($contents)
+    {
+        $bytes_written = File::put($this->outputFile, $contents);
+        
+        if ($bytes_written === false)
+        {
+            $this->error(sprintf('Error writing to file `%s`', $this->outputFile));
+        }
     }
 }
